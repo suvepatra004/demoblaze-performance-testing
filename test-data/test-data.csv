@@ -1,5 +1,4 @@
-
 username,password
-ratuser01,<base64 ratuser01>
-ratuser02,<base64 ratuser02>
-ratuser11,<base64 ratuser11>
+ratuser01,cmF0dXNlcjAx
+ratuser02,cmF0dXNlcjAy
+ratuser11,cmF0dXNlcjEx

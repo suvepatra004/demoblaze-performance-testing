@@ -90,7 +90,7 @@
           <boolProp name="TransactionController.includeTimers">false</boolProp>
         </TransactionController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="01_Home_Page">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="01_Home_Page" enabled="true">
             <stringProp name="HTTPSampler.domain">www.demoblaze.com</stringProp>
             <stringProp name="HTTPSampler.path">/</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
@@ -102,7 +102,7 @@
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree/>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="02_Get_Products">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="02_Get_Products" enabled="true">
             <stringProp name="HTTPSampler.path">/entries</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -114,7 +114,7 @@
           </HTTPSamplerProxy>
           <hashTree/>
         </hashTree>
-        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="TC02_Login">
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="TX02_Login">
           <boolProp name="TransactionController.parent">true</boolProp>
           <boolProp name="TransactionController.includeTimers">false</boolProp>
         </TransactionController>
@@ -138,12 +138,12 @@
           <hashTree>
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="AUTH_TOKEN">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
-              <stringProp name="RegexExtractor.refname">Auth_token: (.+?)&quot;</stringProp>
+              <stringProp name="RegexExtractor.refname">Auth_token: ([^&quot;]+)</stringProp>
               <stringProp name="RegexExtractor.regex"></stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default">TOKEN_NOT_FOUND</stringProp>
               <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
-              <stringProp name="RegexExtractor.match_number"></stringProp>
+              <stringProp name="RegexExtractor.match_number">1</stringProp>
             </RegexExtractor>
             <hashTree/>
           </hashTree>
@@ -163,7 +163,7 @@
               <collectionProp name="Arguments.arguments">
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">{&quot;id&quot;:&quot;${PRODUCT_ID}&quot;}</stringProp>
+                  <stringProp name="Argument.value">{&quot;id&quot;:${__Random(1,9,PRODUCT_ID)}}</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
@@ -196,7 +196,7 @@
               <collectionProp name="Arguments.arguments">
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">{&quot;id&quot;:&quot;${__UUID()}&quot;,&quot;cookie&quot;:&quot;${AUTH_TOKEN}&quot;,&quot;prod_id&quot;:${PRODUCT_ID},&quot;flag&quot;:false}</stringProp>
+                  <stringProp name="Argument.value">{&quot;id&quot;:&quot;${__UUID()}&quot;,&quot;cookie&quot;:&quot;${AUTH_TOKEN}&quot;,&quot;prod_id&quot;:${PRODUCT_ID},&quot;flag&quot;:true}</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
@@ -213,7 +213,7 @@
               <collectionProp name="Arguments.arguments">
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">{&quot;cookie&quot;:&quot;${AUTH_TOKEN}&quot;,&quot;flag&quot;:false}</stringProp>
+                  <stringProp name="Argument.value">{&quot;cookie&quot;:&quot;${AUTH_TOKEN}&quot;,&quot;flag&quot;:true}</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
@@ -221,7 +221,7 @@
           </HTTPSamplerProxy>
           <hashTree/>
         </hashTree>
-        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Uniform Random Timer">
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Uniform Random Timer" enabled="true">
           <stringProp name="ConstantTimer.delay">1000</stringProp>
           <stringProp name="RandomTimer.range">2000</stringProp>
         </UniformRandomTimer>
