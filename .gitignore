@@ -1,0 +1,13 @@
+# JMeter
+jmeter.log
+*.jtl
+results/*
+!results/.gitkeep
+
+# Generated dashboards (commit one sample manually in docs/ later)
+reports/*
+!reports/.gitkeep
+
+# OS / editor
+.DS_Store
+.idea/
