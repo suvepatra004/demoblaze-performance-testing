@@ -1,82 +1,126 @@
 # Demoblaze Performance Testing
 
-This project contains an Apache JMeter load test for the public Demoblaze website. It exercises a representative shopping journey: open the homepage, retrieve products, log in, view a random product, add it to the cart, and view the cart.
+Apache JMeter project for measuring the performance of the Demoblaze shopping workflow.
 
-The test is intended for learning, capacity checks, and repeatable baseline measurements. It is not a functional test suite or a production monitoring solution.
+## What I Prepared
 
-## Test Scope
+- Performance testing project for a public e-commerce demo application
+- Covers homepage access, product listing, login, product browsing, cart operations, and viewing the cart
+- Uses Apache JMeter 5.6.3
+- Supports baseline, load, spike, and stress test profiles
+- Generates JMeter JTL results and HTML dashboards
+- Demonstrates test scripting, parameterization, automation, and performance report analysis
 
-| Transaction    | HTTP operations                                                                          |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| Open home      | `GET https://www.demoblaze.com/` and `GET https://api.demoblaze.com/entries`             |
-| Login          | `POST https://api.demoblaze.com/login`                                                   |
-| Browse product | `POST https://api.demoblaze.com/view` with a randomly selected product ID                |
-| Add to cart    | `POST https://api.demoblaze.com/addtocart` and `POST https://api.demoblaze.com/viewcart` |
+![JMeter baseline dashboard](assets/jmeter-dashboard-baseline.png)
 
-The main test plan contains the following load settings:
+## 1. What I Measured
 
-- Virtual users: `-Jthreads`
-- Ramp-up time: `-Jrampup` seconds
-- Test duration: `-Jduration` seconds
-- Default load: 1 virtual user, 1-second ramp-up, 60-second scheduler
-- Sample error policy: continue testing
-- User pacing: 1-second constant delay plus up to 2 seconds random delay
-- Repeated iterations: controlled by the configured duration
+The objective of this project is to evaluate response time, throughput, error rate, and transaction stability across the primary Demoblaze shopping journey.
 
-CSV users are shared by all threads and recycled when the data list is exhausted. The login response provides an authentication token that is reused for cart operations.
+The test plan is used to:
 
-## Repository Structure
+- Establish a baseline for normal application behavior
+- Compare application response under controlled virtual-user loads
+- Identify slow transactions and response-time outliers
+- Verify that all executed shopping requests complete successfully
+- Produce repeatable JMeter evidence for performance analysis
+
+## 2. Which Application I Tested
+
+- Website: `https://www.demoblaze.com`
+- API host: `https://api.demoblaze.com`
+- Application: Demoblaze public demo store
+
+The workflow follows these steps:
+
+1. Open the Demoblaze homepage.
+2. Retrieve the product catalog.
+3. Log in with test credentials.
+4. Select a random product.
+5. Add the selected product to the cart.
+6. Retrieve and verify the cart.
+
+## 3. What I Covered
+
+| Transaction | Requests |
+|---|---|
+| `TX01_Open_Home` | Homepage and product catalog |
+| `TX02_Login` | Login API |
+| `TX03_Browse_Product` | Product details |
+| `TX04_Add_To_Cart` | Add-to-cart and view-cart APIs |
+
+| Request | Method | Endpoint |
+|---|---|---|
+| Home page | `GET` | `https://www.demoblaze.com/` |
+| Products | `GET` | `/entries` |
+| Login | `POST` | `/login` |
+| Product details | `POST` | `/view` |
+| Add to cart | `POST` | `/addtocart` |
+| View cart | `POST` | `/viewcart` |
+
+## 4. How I Designed the Tests
+
+- Test plan: `test-plans/demoblaze-performance.jmx`
+- Virtual users: controlled by `threads`
+- Ramp-up time: controlled by `rampup`
+- Test duration: controlled by `duration`
+- Sample error behavior: continue after sample errors
+- HTTP protocol: HTTPS
+- Request format: JSON
+- Data source: CSV test credentials
+- Product selection: random product ID from 1 to 9
+- User pacing: 1-second constant delay plus up to 2-second random delay
+- Login token: extracted from the login response and reused for cart requests
+- Cart item ID: generated dynamically with JMeter UUID function
+
+### Load Profiles
+
+| Profile | Virtual Users | Ramp-up | Duration |
+|---|---:|---:|---:|
+| Baseline | 3 | 10 seconds | 120 seconds |
+| Load | 10 | 60 seconds | 300 seconds |
+| Spike | 20 | 5 seconds | 120 seconds |
+| Stress | 25 | 300 seconds | 420 seconds |
+
+Profiles are stored in:
+
+- `config/baseline.properties`
+- `config/load.properties`
+- `config/spike.properties`
+- `config/stress.properties`
+
+## 5. How I Structured the Project
 
 ```text
 demoblaze-performance-testing/
-├── test-plans/
-│   └── demoblaze-performance.jmx  # Parameterized, command-line-friendly test plan
-├── test-data/
-│   └── test-data.csv              # Test username and Base64 password values
-├── demoblaze-performance.jmx      # Fixed-load development copy
-├── results/
-│   └── .gitkeep                   # JTL output directory
-├── reports/
-│   └── .gitkeep                   # HTML dashboard output directory
-└── .gitignore                     # Excludes JMeter logs, JTL files, and reports
+├── test-plans/                 JMeter test plans
+├── test-data/                  CSV credentials
+├── config/                     Load profile properties
+├── scripts/                    CLI test runner
+├── assets/                     Portfolio evidence
+├── results/                    JTL result files
+├── reports/                    HTML dashboards
+└── demoblaze-performance.jmx   Fixed-load development plan
 ```
 
-Use `test-plans/demoblaze-performance.jmx` for repeatable non-GUI runs. The root JMX file is a fixed-load copy with 3 users and 2 iterations.
+## 6. How I Prepared the Environment
 
-## Prerequisites
+### Step 1: Install prerequisites
 
+- Java 8 or later
 - Apache JMeter 5.6.3 or a compatible JMeter 5.x release
-- Java available on `PATH`
-- Network access to `www.demoblaze.com` and `api.demoblaze.com`
+- Network access to Demoblaze
 
-Verify the tools:
+### Step 2: Verify installation
 
 ```bash
 java -version
 jmeter -v
 ```
 
-On macOS, JMeter can be installed with Homebrew:
+### Step 3: Review test credentials
 
-```bash
-brew install jmeter
-```
-
-## Initial Configuration
-
-The test plan currently defines absolute paths for the CSV file. Before running from a different machine or directory, open the **CSV Data Set Config** in JMeter and set **Filename** to:
-
-```text
-/absolute/path/to/demoblaze-performance-testing/test-data/test-data.csv
-```
-
-To use a relative value, start JMeter from the repository root and set the filename to:
-
-```text
-test-data/test-data.csv
-```
-
-The CSV format is:
+Test credentials are maintained in `test-data/test-data.csv`.
 
 ```csv
 username,password
@@ -85,107 +129,173 @@ ratuser02,cmF0dXNlcjAy
 ratuser11,cmF0dXNlcjEx
 ```
 
-The password column contains Base64-encoded test credentials. Existing accounts, or additional valid test accounts, may be required because Demoblaze is an external service. Do not place real credentials or secrets in this repository.
+The password values are Base64 encoded.
 
-## Run the Test
+Real credentials or secrets are not included in this project.
 
-Run from the repository root:
+### Step 4: Configure the CSV path
 
-```bash
-mkdir -p results reports
+Open `CSV Data Set Config` in JMeter.
 
-jmeter -n \
-  -t test-plans/demoblaze-performance.jmx \
-  -l results/demoblaze-results.jtl \
-  -Jthreads=10 \
-  -Jrampup=30 \
-  -Jduration=300
+For repository-root execution:
+
+```text
+test-data/test-data.csv
 ```
 
-Parameter meanings:
+For execution from another location, use the absolute path:
 
-| Parameter  | Default | Example | Purpose                           |
-| ---------- | ------: | ------: | --------------------------------- |
-| `threads`  |     `1` |    `25` | Concurrent virtual users          |
-| `rampup`   |     `1` |    `60` | Seconds used to start all users   |
-| `duration` |    `60` |   `600` | Scheduled run duration in seconds |
-
-For example, a 25-user, five-minute smoke or baseline run with a 60-second ramp is:
-
-```bash
-jmeter -n \
-  -t test-plans/demoblaze-performance.jmx \
-  -l results/baseline-25-users.jtl \
-  -Jthreads=25 \
-  -Jrampup=60 \
-  -Jduration=300
+```text
+/absolute/path/to/demoblaze-performance-testing/test-data/test-data.csv
 ```
 
-## Generate an HTML Report
+## 7. How I Ran the Tests
 
-Generate a dashboard after an execution:
+### Run through the automation script
+
+Run each profile from the repository root:
 
 ```bash
-jmeter -g results/demoblaze-results.jtl \
-  -o reports/demoblaze-dashboard
+./scripts/run-test.sh baseline
+./scripts/run-test.sh load
+./scripts/run-test.sh spike
+./scripts/run-test.sh stress
 ```
 
-The dashboard includes throughput, response times, error counts, and time-series charts. Remove or replace an existing report directory before generating a new dashboard.
+The script performs the following actions:
 
-To run and generate the dashboard in one command:
+1. Loads the selected profile properties.
+2. Creates timestamped JTL output.
+3. Creates a timestamped JMeter log.
+4. Generates an HTML report.
+5. Prints the report location after successful execution.
+
+### Run JMeter directly
 
 ```bash
 jmeter -n \
   -t test-plans/demoblaze-performance.jmx \
-  -l results/demoblaze-results.jtl \
-  -e -o reports/demoblaze-dashboard \
-  -Jthreads=10 \
-  -Jrampup=30 \
-  -Jduration=300
+  -l results/baseline.jtl \
+  -Jthreads=3 \
+  -Jrampup=10 \
+  -Jduration=120
 ```
 
-Generated `.jtl` files and dashboards are intentionally excluded by `.gitignore`.
-
-## Test Data and Runtime Behavior
-
-- `USERNAME` and `PASSWORD_B64` are read from the CSV Data Set.
-- `PRODUCT_ID` is randomly selected from 1 through 9 for each thread iteration.
-- `AUTH_TOKEN` is extracted from the login response body using `Auth_token: ...`.
-- A UUID is generated for each cart item identifier.
-- Cart requests use the extracted login token.
-- The uniform random timer waits 1 to 3 seconds between virtual-user iterations.
-
-## GUI Development
-
-Open the test plan in JMeter GUI mode for editing or debugging:
+### Open in JMeter GUI
 
 ```bash
 jmeter -t test-plans/demoblaze-performance.jmx
 ```
 
-The View Results Tree listener is disabled in the parameterized plan. Enable it only during small debugging runs because recording full response details adds overhead and can affect load measurements.
+The View Results Tree listener is disabled in the parameterized plan to reduce GUI and memory overhead during load execution.
 
-## Validation and Reporting Guidelines
+## 8. How I Generated the Reports
 
-Review these metrics before comparing runs:
+Create a dashboard from JTL results:
 
-- **Throughput:** completed requests or transactions per second
-- **Response time:** average and percentile latency
-- **Error percentage:** failed HTTP samples
-- **Concurrency:** active threads during ramp and steady state
-- **Transaction health:** results for each `TX01_*` through `TX04_*` transaction
+```bash
+jmeter -g results/baseline.jtl \
+  -o reports/baseline-dashboard
+```
 
-Use the same JMeter version, host, network path, ramp-up, duration, and virtual-user count for valid comparisons. Establish and document environment-specific SLO thresholds before declaring a run a pass or fail.
+The dashboard includes:
 
-The current plan does not assert HTTP status codes or response content, and it does not include formal pass/fail thresholds. Analysis should therefore confirm both JTL error rates and application behavior in the HTML dashboard.
+- Request pass and error summary
+- APDEX results
+- Response-time charts
+- Throughput results
+- Transaction-level statistics
 
-## Known Considerations
+## 9. What I Found in the Baseline Run
 
-- The tested application and external API availability are outside this repository's control.
-- Demoblaze test accounts may be shared or changed without notice.
-- Load results may vary with JMeter host resources, location, ISP routing, and third-party service health.
-- `-Jduration` controls the scheduler; there is no separate command-line loop count.
-- Response caching, browser rendering, JavaScript execution, and Think Time that occur in a real browser are not represented.
-- The test plan uses the external Demoblaze API and should not be used for high-volume or production-like load without authorization.
+### Test Details
 
----
+- Profile: Baseline
+- Virtual users: 3
+- Ramp-up: 10 seconds
+- Duration: 120 seconds
+- Execution date: November 23, 2026
+- Execution period: 11:17 AM to 11:19 AM
+- Source result: `baseline-20261123-111731.jtl`
+
+### Result Summary
+
+| Metric | Result |
+|---|---:|
+| Total samples | 144 |
+| Failed samples | 0 |
+| Error percentage | 0% |
+| Mean response time | 456 ms |
+| Median response time | 393 ms |
+| Maximum response time | 3354 ms |
+| Overall throughput | 1.227 requests/second |
+| Overall APDEX | 0.842 |
+| Requests passed | 100% |
+
+### Transaction Summary
+
+| Transaction | Mean Response Time |
+|---|---:|
+| `TX01_Open_Home` | 831 ms |
+| `TX02_Login` | 429 ms |
+| `TX03_Browse_Product` | 457 ms |
+| `TX04_Add_To_Cart` | 968 ms |
+
+Key observations:
+
+- All recorded requests passed.
+- No HTTP sample errors were recorded.
+- Overall APDEX was 0.842.
+- `TX04_Add_To_Cart` had the highest mean and maximum response time.
+- The maximum response time reached 3354 ms.
+- The cart transaction requires comparison against additional repeat runs.
+
+## 10. How I Analyzed the Results
+
+Each test run should be evaluated using the following metrics:
+
+- Response time: minimum, average, median, and maximum
+- Percentile response times
+- Error percentage
+- Transaction throughput
+- Application error count
+- Virtual-user concurrency
+- APDEX score
+- Transaction-level response-time variance
+
+Comparison runs should use:
+
+- The same JMeter version
+- The same test environment
+- The same virtual-user profile
+- The same ramp-up and duration
+- The same network location
+- The same test data
+
+The current test plan has no automated assertion thresholds.
+
+## 11. Skills I Demonstrated
+
+- JMeter test-plan development
+- HTTP API load testing
+- JSON request configuration
+- CSV-driven test data
+- Dynamic variables and JMeter functions
+- Authentication token extraction
+- Transaction-level measurement
+- Load-profile configuration
+- Command-line JMeter execution
+- HTML dashboard generation
+- Performance result analysis
+- Repeatable test automation through shell scripting
+- Test evidence documentation
+
+## 12. Limitations I Identified
+
+- The target application is external and not owned by this project.
+- Account availability may change over time.
+- Browser rendering and JavaScript execution are not simulated.
+- Response caching and Think Time differ from real browser behavior.
+- The public environment may limit repeatability.
+- Formal SLO thresholds are not yet configured in JMeter assertions.
+****
