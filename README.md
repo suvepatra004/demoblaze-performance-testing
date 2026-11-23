@@ -12,6 +12,7 @@ Apache JMeter project for measuring the performance of the Demoblaze shopping wo
 - Demonstrates test scripting, parameterization, automation, and performance report analysis
 
 ![JMeter baseline dashboard](assets/jmeter-dashboard-baseline.png)
+![JMeter Statistics dashboard](assets/statistics.png)
 
 ## 1. What I Measured
 
@@ -42,21 +43,21 @@ The workflow follows these steps:
 
 ## 3. What I Covered
 
-| Transaction | Requests |
-|---|---|
-| `TX01_Open_Home` | Homepage and product catalog |
-| `TX02_Login` | Login API |
-| `TX03_Browse_Product` | Product details |
-| `TX04_Add_To_Cart` | Add-to-cart and view-cart APIs |
+| Transaction           | Requests                       |
+| --------------------- | ------------------------------ |
+| `TX01_Open_Home`      | Homepage and product catalog   |
+| `TX02_Login`          | Login API                      |
+| `TX03_Browse_Product` | Product details                |
+| `TX04_Add_To_Cart`    | Add-to-cart and view-cart APIs |
 
-| Request | Method | Endpoint |
-|---|---|---|
-| Home page | `GET` | `https://www.demoblaze.com/` |
-| Products | `GET` | `/entries` |
-| Login | `POST` | `/login` |
-| Product details | `POST` | `/view` |
-| Add to cart | `POST` | `/addtocart` |
-| View cart | `POST` | `/viewcart` |
+| Request         | Method | Endpoint                     |
+| --------------- | ------ | ---------------------------- |
+| Home page       | `GET`  | `https://www.demoblaze.com/` |
+| Products        | `GET`  | `/entries`                   |
+| Login           | `POST` | `/login`                     |
+| Product details | `POST` | `/view`                      |
+| Add to cart     | `POST` | `/addtocart`                 |
+| View cart       | `POST` | `/viewcart`                  |
 
 ## 4. How I Designed the Tests
 
@@ -75,12 +76,12 @@ The workflow follows these steps:
 
 ### Load Profiles
 
-| Profile | Virtual Users | Ramp-up | Duration |
-|---|---:|---:|---:|
-| Baseline | 3 | 10 seconds | 120 seconds |
-| Load | 10 | 60 seconds | 300 seconds |
-| Spike | 20 | 5 seconds | 120 seconds |
-| Stress | 25 | 300 seconds | 420 seconds |
+| Profile  | Virtual Users |     Ramp-up |    Duration |
+| -------- | ------------: | ----------: | ----------: |
+| Baseline |             3 |  10 seconds | 120 seconds |
+| Load     |            10 |  60 seconds | 300 seconds |
+| Spike    |            20 |   5 seconds | 120 seconds |
+| Stress   |            25 | 300 seconds | 420 seconds |
 
 Profiles are stored in:
 
@@ -220,26 +221,26 @@ The dashboard includes:
 
 ### Result Summary
 
-| Metric | Result |
-|---|---:|
-| Total samples | 144 |
-| Failed samples | 0 |
-| Error percentage | 0% |
-| Mean response time | 456 ms |
-| Median response time | 393 ms |
-| Maximum response time | 3354 ms |
-| Overall throughput | 1.227 requests/second |
-| Overall APDEX | 0.842 |
-| Requests passed | 100% |
+| Metric                |                Result |
+| --------------------- | --------------------: |
+| Total samples         |                   144 |
+| Failed samples        |                     0 |
+| Error percentage      |                    0% |
+| Mean response time    |                456 ms |
+| Median response time  |                393 ms |
+| Maximum response time |               3354 ms |
+| Overall throughput    | 1.227 requests/second |
+| Overall APDEX         |                 0.842 |
+| Requests passed       |                  100% |
 
 ### Transaction Summary
 
-| Transaction | Mean Response Time |
-|---|---:|
-| `TX01_Open_Home` | 831 ms |
-| `TX02_Login` | 429 ms |
-| `TX03_Browse_Product` | 457 ms |
-| `TX04_Add_To_Cart` | 968 ms |
+| Transaction           | Mean Response Time |
+| --------------------- | -----------------: |
+| `TX01_Open_Home`      |             831 ms |
+| `TX02_Login`          |             429 ms |
+| `TX03_Browse_Product` |             457 ms |
+| `TX04_Add_To_Cart`    |             968 ms |
 
 Key observations:
 
@@ -298,4 +299,5 @@ The current test plan has no automated assertion thresholds.
 - Response caching and Think Time differ from real browser behavior.
 - The public environment may limit repeatability.
 - Formal SLO thresholds are not yet configured in JMeter assertions.
-****
+
+---
