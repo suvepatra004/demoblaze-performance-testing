@@ -11,3 +11,5 @@ reports/*
 # OS / editor
 .DS_Store
 .idea/
+
+logs/
